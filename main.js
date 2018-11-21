@@ -1,5 +1,6 @@
 // setup canvas
-
+const MAXBALLS = 30;
+const BACKGROUND_FILLSTYLE = 'rgba(0, 0, 0, 0.3)';
 var canvas = document.querySelector('canvas');
 var ctx = canvas.getContext('2d');
 
@@ -13,7 +14,8 @@ function random(min,max) {
   return num;
 }
 
-function Ball(x, y, velX, velY, color, size) {
+function Ball(num, x, y, velX, velY, color, size) {
+  this.num = num;
   this.x = x;
   this.y = y;
   this.velX = velX;
@@ -59,15 +61,9 @@ Ball.prototype.collisionDetect = function() {
       var dx = this.x - balls[j].x;
       var dy = this.y - balls[j].y;
       var distance = Math.sqrt(dx * dx + dy * dy);
+      // var other = balls[j];
 
       if (distance < this.size + balls[j].size) {
-        // balls[j].color = this.color = 'rgb(' + random(0, 255) + ',' + random(0, 255) + ',' + random(0, 255) + ')';
-
-        // (balls[j].color + this.color) / 2;
-        // this.velX = -(this.velX);
-        // this.velY = -(this.velY);
-        // var thisVelocity = Math.sqrt((this.velX * this.velX) + (this.velY * this.velY));
-        // var otherVelocity = Math.sqrt((balls[j].velX * balls[j].velX) + (balls[j].velY * balls[j].velY));
         var newVelX = (this.velX * (this.size - balls[j].size) + (2 * balls[j].size * balls[j].velX)) / (this.size + balls[j].size);
         balls[j].velX = (balls[j].velX * (balls[j].size - this.size) + (2 * this.size * this.velX)) / (balls[j].size + this.size);
         this.velX = newVelX;
@@ -76,38 +72,41 @@ Ball.prototype.collisionDetect = function() {
         balls[j].velY = (balls[j].velY * (balls[j].size - this.size) + (2 * this.size * this.velY)) / (balls[j].size + this.size);
         this.velY = newVelY;
 
-        this.update();
         balls[j].update();
-
-        // if (this.velX == 0 && this.velY == 0) {
-        //   this.velX = -(balls[j].velX * 0.75);
-        //   this.velY = -(balls[j].velY * 0.63);
-        // }
+        balls[j].draw();
+        this.update();
+        this.draw();
       }
     }
   }
 };
 
+Ball.prototype.collisionDraw = function () {
+  for (var j = 0; j < balls.length; j++) {
+    if (!(this === balls[j])) {
+      var dx = this.x - balls[j].x;
+      var dy = this.y - balls[j].y;
+      var distance = Math.sqrt(dx * dx + dy * dy);
 
-var balls = [];
+      if (distance < this.size + balls[j].size + 1) {
+        var size = random(10, 30);
+        this.x = random(0 + size, width - size);
+        this.y = random(0 + size, height - size);
+        j = -1;
+      }
+    }
+  }
+  console.log("ballNum:" + this.num + "   x:" + this.x + ", y:" + this.y);
+  balls.push(this);
+  this.draw();
+};
 
 
 function loop() {
-  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  // width = canvas.width = window.innerWidth;
+  // height = canvas.height = window.height;
+  ctx.fillStyle = BACKGROUND_FILLSTYLE;
   ctx.fillRect(0, 0, width, height);
-
-  while (balls.length < 25) {
-    var size = random(10, 20);
-    var ball = new Ball(
-      random(0 + size, width - size),
-      random(0 + size, height - size),
-      random(-7, 7),
-      random(-7, 7),
-      'rgb(' + random(0, 255) + ',' + random(0, 255) + ',' + random(0, 255) + ')',
-      size
-    );
-    balls.push(ball);
-  }
 
   for (var i = 0; i < balls.length; i++) {
     balls[i].draw();
@@ -116,6 +115,42 @@ function loop() {
   }
 
   requestAnimationFrame(loop);
+}
+
+var balls = [];
+var size = random(30, 63);
+var ball = new Ball(
+  1,
+  random(0 + size, width - size),
+  random(0 + size, height - size),
+  random(-1, 1),
+  random(-1, 1),
+  'rgb(' + random(100, 200) + ',' + random(100, 200) + ',' + random(100, 200) + ')',
+    // ' + random(0, 255) + ', ' + random(0, 255) + ', ' + random(0, 255) + ')',
+  size
+);
+
+Change this to a do while you lazy fuck.
+
+balls.push(ball);
+ctx.fillStyle = BACKGROUND_FILLSTYLE;
+ctx.fillRect(0, 0, width, height);
+console.log("ballNum:" + ball.num + "   x:" + ball.x + ", y:" + ball.y);
+ball.draw();
+
+while (balls.length < MAXBALLS) {
+  var size = random(20, 50);
+  var ball = new Ball(
+    balls.length + 1,
+    random(0 + size, width - size),
+    random(0 + size, height - size),
+    random(-12,12),
+    random(-12,12),
+    'rgb(' + random(0, 255) + ',' + random(0, 255) + ',' + random(0, 255) + ')',
+    size
+  );
+
+  ball.collisionDraw();
 }
 
 loop();
