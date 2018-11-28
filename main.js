@@ -2,6 +2,7 @@
 var para = document.querySelector('p');
 const MAXBALLS = 3;
 const BACKGROUND_FILLSTYLE = 'rgba(0, 0, 0, 0.75)';
+const REFRESH_RATE = 1000.0 / 60.0;
 var canvas = document.getElementById('myCanvas');
 var ctx = canvas.getContext('2d');
 var balls = [];
@@ -236,7 +237,7 @@ function gameFinished() {
   balls = [];
   count = MAXBALLS;
   evilCircle.setControls();
-  setTimeout(restartGame, 9);
+  setTimeout(restartGame, REFRESH_RATE);
 }
 
 function refreshRectangle() {
@@ -293,7 +294,7 @@ function startGame() {
   evilCircle.checkBounds();
   evilCircle.collisionDetect();
   para.textContent = 'Balls Remaining: ' + count;
-  setInterval(loop, 1000.0/60.0);
+  setInterval(loop, REFRESH_RATE);
 }
 
 
