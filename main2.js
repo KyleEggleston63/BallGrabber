@@ -182,6 +182,7 @@ var evil = new EvilCircle(random(0,width), random(0,height), true);
 evil.setControls();
 
 function loop() {
+  ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = 'rgba(0,0,0,0.25)';
   ctx.fillRect(0,0,width,height);
 

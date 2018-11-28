@@ -1,12 +1,14 @@
 // setup canvas
 var para = document.querySelector('p');
 const MAXBALLS = 3;
-const BACKGROUND_FILLSTYLE = 'rgba(0, 0, 0, 1)';
-var canvas = document.querySelector('canvas');
+const BACKGROUND_FILLSTYLE = 'rgba(0, 0, 0, 0.75)';
+var canvas = document.getElementById('myCanvas');
 var ctx = canvas.getContext('2d');
-
+var balls = [];
 var width = canvas.width = window.innerWidth;
 var height = canvas.height = window.innerHeight;
+var evilCircle = new CircleOfEvil(random(0, width), random(0, height), true);
+
 
 // function to generate random number
 
@@ -36,23 +38,32 @@ CircleOfEvil.prototype.constructor = CircleOfEvil;
 
 CircleOfEvil.prototype.draw = function () {
   ctx.beginPath();
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = this.color;
+  ctx.lineWidth = 9;
   ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI);
+  var grd = ctx.createRadialGradient(this.x, this.y, this.size * .01, this.x, this.y, this.size);
+  grd.addColorStop(0, "green");
+  grd.addColorStop(1, "black");
+  ctx.fillStyle = grd;
+  ctx.fill();
+  var grd = ctx.createRadialGradient(this.x, this.y, this.size * .95, this.x, this.y, this.size);
+  grd.addColorStop(1, 'black');
+  grd.addColorStop(0, "rgb(9,9,9)");
+  ctx.strokeStyle = grd;
   ctx.stroke();
+  ctx.closePath();
 }
 
 CircleOfEvil.prototype.setControls = function () {
   var _this = this;
   window.onkeydown = function (e) {
-      console.log(e.keyCode);
-      if (e.keyCode === 65) {
+
+      if (e.keyCode === 65 || e.keyCode ===  37) {
         _this.x -= _this.velX;
-      } else if (e.keyCode === 68) {
+      } else if (e.keyCode === 68 || e.keyCode === 39) {
         _this.x += _this.velX;
-      } else if (e.keyCode === 87) {
+      } else if (e.keyCode === 87 || e.keyCode === 38) {
         _this.y -= _this.velY;
-      } else if (e.keyCode === 83) {
+      } else if (e.keyCode === 83 || e.keyCode === 40) {
         _this.y += _this.velY;
       }
     }
@@ -80,7 +91,7 @@ CircleOfEvil.prototype.checkBounds = function () {
 
 CircleOfEvil.prototype.collisionDetect = function () {
   for (var j = 0; j < balls.length; j++) {
-    if ( balls[j].exists ) {
+    if (balls[j].exists) {
       var dx = this.x - balls[j].x;
       var dy = this.y - balls[j].y;
       var distance = Math.sqrt(dx * dx + dy * dy);
@@ -90,17 +101,6 @@ CircleOfEvil.prototype.collisionDetect = function () {
         balls[j].exists = false;
         count--;
         para.textContent = 'Balls Remaining: ' + count;
-        if (count <= 0) {
-          updateAllBalls();
-          ctx.fillStyle = 'black';
-          ctx.fillRect(0, 0, width, height);
-          evilCircle.draw();
-          requestAnimationFrame(collisionDetect);
-          window.alert("CONGRATULATIONS!  You sucked up " + MAXBALLS + " balls");
-            // in " + totalSeconds + " seconds!");
-
-          drawBalls();
-        }
       }
     }
   }
@@ -109,7 +109,9 @@ CircleOfEvil.prototype.collisionDetect = function () {
 
 function Ball(num, x, y, velX, velY, exists, color, size) {
   Shape.call(this, x, y, velX, velY, exists);
+
   this.num = num;
+  console.log(this.num + ' - VelX: ', this.velX, '   VelY: ', this.velY);
   this.color = color;
   this.size = size;
 }
@@ -124,6 +126,7 @@ Ball.prototype.draw = function() {
   ctx.fillStyle = this.color;
   ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI);
   ctx.fill();
+  ctx.closePath();
 }
 
 Ball.prototype.update = function () {
@@ -191,13 +194,10 @@ Ball.prototype.collisionDraw = function () {
       }
     }
   }
-  console.log("ballNum:" + this.num + "   x:" + this.x + ", y:" + this.y);
+
   balls.push(this);
   this.draw();
 };
-
-var evilCircle = new CircleOfEvil(random(0, width), random(0, height), true);
-evilCircle.setControls();
 
 function updateAllBalls() {
   for (var i = 0; i < balls.length; i++) {
@@ -209,32 +209,54 @@ function updateAllBalls() {
   }
 }
 
-function loop() {
-  // width = canvas.width = window.innerWidth;
-  // height = canvas.height = window.height;
+function clearScreen() {
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = 'black';
+  ctx.fillRect(0, 0, width, height);
   ctx.fillStyle = BACKGROUND_FILLSTYLE;
   ctx.fillRect(0, 0, width, height);
+}
 
-  updateAllBalls();
+function restartGame() {
+  clearScreen();
+  window.alert("CONGRATULATIONS!  You sucked up " + MAXBALLS + " balls");
+    // in " + totalSeconds + " seconds!");
+  startGame();
+}
 
+function gameFinished() {
+  // canvas = document.querySelector('canvas');
+  // ctx = canvas.getContext('2d');
+  // width = canvas.width = window.innerWidth;
+  // height = canvas.height = window.innerHeight;
+  // evilCircle = new CircleOfEvil(random(0, width), random(0, height), true);
+  clearInterval(loop);
+  clearScreen();
   evilCircle.draw();
-  evilCircle.checkBounds();
-  evilCircle.collisionDetect();
+  balls = [];
+  count = MAXBALLS;
+  evilCircle.setControls();
+  setTimeout(restartGame, 9);
+}
 
-  requestAnimationFrame(loop);
+function refreshRectangle() {
+  // ctx.clearRect(0, 0, width, height);
+  ctx.beginPath();
+  ctx.fillStyle = BACKGROUND_FILLSTYLE;
+  ctx.fillRect(0, 0, width, height);
+  ctx.closePath();
 }
 
 function drawBalls() {
   balls = [];
-  count = MAXBALLS;
   do {
     var size = random(20, 50);
     var ball = new Ball(
       balls.length + 1,
       random(0 + size, width - size),
       random(0 + size, height - size),
-      random(-12,12),
-      random(-12,12),
+      random(-9,9),
+      random(-9,9),
       true,
       'rgb(' + random(0, 255) + ',' + random(0, 255) + ',' + random(0, 255) + ')',
       size
@@ -244,13 +266,35 @@ function drawBalls() {
   } while (balls.length < MAXBALLS);
 }
 
-ctx.fillStyle = BACKGROUND_FILLSTYLE;
-ctx.fillRect(0, 0, width, height);
-var balls = [];
-var count;
+function loop() {
 
-drawBalls();
+  if (count <= 0) {
+    gameFinished();
 
-para.textContent = 'Balls Remaining: ' + count;
+  } else {
+    refreshRectangle();
+    updateAllBalls();
+    evilCircle.draw();
+    evilCircle.checkBounds();
+    evilCircle.collisionDetect();
+  }
+}
 
-loop();
+function startGame() {
+  balls = [];
+  count = MAXBALLS;
+  width = canvas.width = window.innerWidth;
+  height = canvas.height = window.innerHeight;
+  evilCircle = new CircleOfEvil(random(0, width), random(0, height), true);
+  evilCircle.setControls();
+  clearScreen();
+  drawBalls();
+  evilCircle.draw();
+  evilCircle.checkBounds();
+  evilCircle.collisionDetect();
+  para.textContent = 'Balls Remaining: ' + count;
+  setInterval(loop, 1000.0/60.0);
+}
+
+
+startGame();
