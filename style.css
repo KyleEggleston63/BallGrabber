@@ -1,33 +1,78 @@
 html, body {
-  margin: 0;
+  margin: auto;
 }
 
 html {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  height: 100%;
 }
 
 body {
   overflow: hidden;
   height: inherit;
+  text-align: center;
+  background-color: aqua;
+}
+
+button {
+  position: absolute;
+  background-color: rgb(78, 78, 78); /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  /*text-align: center;
+  text-decoration: none;
+  text-shadow: 1px 1px 2px black; */
+  display: inline-block;
+  font-size: 32px;
+  top: 45%;
+  border-radius: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  right: 0;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  transform: translateX(-50%)
 }
 
 h1 {
-  font-size: 2rem;
+  /* top: 20%;
+  width: 50%;
+
+  border: none;
+  color: red;
+
+  font-size: 6.3rem;
+  letter-spacing: .25 rem;
+  padding: 15px 32px; */
+
+  text-shadow: 0 0 4px white;
+  background-color: transparent;/*rgb(78, 78, 78);*/
+  font-size: 6.3rem;
   letter-spacing: -1px;
   position: absolute;
   margin: 0;
-  top: -4px;
-  right: 5px;
+  text-align: center;
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right: 0;
+  top: 12%;
+  /*top: -4px;
+  right: 5px; */
 
   color: transparent;
   text-shadow: 0 0 4px white;
+
 }
+
 
 p {
   position: absolute;
   margin: 0;
   top: 35px;
-  right: 5px;
-  color: #aaa;
+  right: 50%;
+  color: orange;
+  display: block;
+  background-color: transparent;
 }

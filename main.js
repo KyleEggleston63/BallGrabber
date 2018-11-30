@@ -1,14 +1,14 @@
-// setup canvas
-var para = document.querySelector('p');
 const MAXBALLS = 3;
 const BACKGROUND_FILLSTYLE = 'rgba(0, 0, 0, 0.75)';
 const REFRESH_RATE = 1000.0 / 60.0;
-var canvas = document.getElementById('myCanvas');
+var para = document.querySelector('p');
+var canvas = document.querySelector('canvas');
 var ctx = canvas.getContext('2d');
 var balls = [];
 var width = canvas.width = window.innerWidth;
 var height = canvas.height = window.innerHeight;
 var evilCircle = new CircleOfEvil(random(0, width), random(0, height), true);
+var interval;
 
 
 // function to generate random number
@@ -219,25 +219,19 @@ function clearScreen() {
 }
 
 function restartGame() {
+  clearInterval(interval);
   clearScreen();
-  window.alert("CONGRATULATIONS!  You sucked up " + MAXBALLS + " balls");
+  window.alert("CONGRATULATIONS!  You grabbed " + MAXBALLS + " balls");
     // in " + totalSeconds + " seconds!");
-  startGame();
+  splashScreen();
 }
 
 function gameFinished() {
-  // canvas = document.querySelector('canvas');
-  // ctx = canvas.getContext('2d');
-  // width = canvas.width = window.innerWidth;
-  // height = canvas.height = window.innerHeight;
-  // evilCircle = new CircleOfEvil(random(0, width), random(0, height), true);
-  clearInterval(loop);
+  clearInterval(interval);
   clearScreen();
-  evilCircle.draw();
   balls = [];
   count = MAXBALLS;
-  evilCircle.setControls();
-  setTimeout(restartGame, REFRESH_RATE);
+  setTimeout(restartGame, REFRESH_RATE*2);
 }
 
 function refreshRectangle() {
@@ -256,8 +250,8 @@ function drawBalls() {
       balls.length + 1,
       random(0 + size, width - size),
       random(0 + size, height - size),
-      random(-9,9),
-      random(-9,9),
+      random(-5,5),
+      random(-5,5),
       true,
       'rgb(' + random(0, 255) + ',' + random(0, 255) + ',' + random(0, 255) + ')',
       size
@@ -282,20 +276,49 @@ function loop() {
 }
 
 function startGame() {
-  balls = [];
   count = MAXBALLS;
-  width = canvas.width = window.innerWidth;
+  balls = [];
+  width =  canvas.width = window.innerWidth;
   height = canvas.height = window.innerHeight;
   evilCircle = new CircleOfEvil(random(0, width), random(0, height), true);
   evilCircle.setControls();
+  startButton.style.display = "none";
+  var ballCounter = document.getElementById('worldCounter');
+  ballCounter.style.display = "block";
+  var header = document.getElementById('splashHeader');
+  header.style.display = "none";
   clearScreen();
   drawBalls();
   evilCircle.draw();
   evilCircle.checkBounds();
   evilCircle.collisionDetect();
   para.textContent = 'Balls Remaining: ' + count;
-  setInterval(loop, REFRESH_RATE);
+  interval = setInterval(loop, REFRESH_RATE);
+
 }
 
+function splashScreen() {
+  clearScreen();
+  var grd = ctx.createRadialGradient(width / 2, height / 2, .01, width/1.5 , height / 1.5, width/2);
+  grd.addColorStop(0, "green");
+  grd.addColorStop(1, "black");
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, width, height);
+  startButton.style.display = "block";
+  var header = document.getElementById('splashHeader');
+  header.style.display = 'inline-block';
+  var ballCounter = document.getElementById('worldCounter');
+  ballCounter.style.display = "none";
+}
 
-startGame();
+var count = MAXBALLS;
+
+var startButton = document.createElement('button');
+startButton.innerHTML = "PLAY";
+document.body.appendChild(startButton);
+startButton.addEventListener('click', startGame);
+
+var blah = document.getElementById('freakingButton');
+blah.style.display = "none";
+
+splashScreen();
