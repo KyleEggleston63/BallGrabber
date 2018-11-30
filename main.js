@@ -1,4 +1,4 @@
-const MAXBALLS = 3;
+const MAXBALLS = 30;
 const BACKGROUND_FILLSTYLE = 'rgba(0, 0, 0, 0.75)';
 const REFRESH_RATE = 1000.0 / 60.0;
 var para = document.querySelector('p');
@@ -9,6 +9,7 @@ var width = canvas.width = window.innerWidth;
 var height = canvas.height = window.innerHeight;
 var evilCircle = new CircleOfEvil(random(0, width), random(0, height), true);
 var interval;
+var totalBalls = 0;
 
 
 // function to generate random number
@@ -221,7 +222,7 @@ function clearScreen() {
 function restartGame() {
   clearInterval(interval);
   clearScreen();
-  window.alert("CONGRATULATIONS!  You grabbed " + MAXBALLS + " balls");
+  window.alert("CONGRATULATIONS!  You grabbed " + totalBalls + " balls");
     // in " + totalSeconds + " seconds!");
   splashScreen();
 }
@@ -230,7 +231,6 @@ function gameFinished() {
   clearInterval(interval);
   clearScreen();
   balls = [];
-  count = MAXBALLS;
   setTimeout(restartGame, REFRESH_RATE*2);
 }
 
@@ -244,6 +244,7 @@ function refreshRectangle() {
 
 function drawBalls() {
   balls = [];
+  totalBalls = random(1, MAXBALLS);
   do {
     var size = random(20, 50);
     var ball = new Ball(
@@ -258,7 +259,8 @@ function drawBalls() {
     );
 
     ball.collisionDraw();
-  } while (balls.length < MAXBALLS);
+  } while (balls.length < totalBalls);
+  count = totalBalls;
 }
 
 function loop() {
